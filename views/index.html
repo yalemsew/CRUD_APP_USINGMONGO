@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Add, Get, Edit and Delete Items</h2>
+
+    <form id="productForm">
+        <div>Name<input type="text" id="name" placeholder="name of product" name="name" /></div>
+        <div>Price <input type="text" id="price" placeholder="price of product" name="price" /></div>
+        <div>Quantity <input type="text" id="quantity" placeholder="quantit of product" name="quantity" /></div>
+    </form>
+    <input type="hidden" id="hiddent">
+    <input type="button" id="add" value="Add" name="add" onclick="changeData('add')" />
+
+    <div>Id <input type="text" id="id" placeholder="put the product id" name="id"></div>
+
+    <input type="button" id="get" name="get" value="Get" onclick="changeData('get')" />
+    <input type="button" id="edit" name="edit" value="Edit" onclick="changeData('edit')" />
+    <input type="button" id="delete" name="delete" value="Delete" onclick="changeData('delete')" />
+
+
+    <!-- display page -->
+    <div id="displayContainer">
+        <div id="name1"></div>
+        <div id="price1"></div>
+        <div id="quantit1"></div>
+        <div id="Id1"></div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+
+    </table>
+
+</body>
+<!-- <script src="app.js"></script> -->
+<script>
+    async function changeData(action) {
+        console.log("clicked")
+        // var data = new FormData(document.getElementById("productForm"));
+        var displayContainer = document.getElementById("displayContainer");
+        const name = document.getElementById("name").value;
+        const price = document.getElementById("price").value;
+        const quantity = document.getElementById("quantity").value;
+        const id = document.getElementById("id").value;
+
+
+        if (action == "add") {
+            try {
+                const response = await fetch("http://localhost:3000/api/products", {
+                    method: "post",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        price: price,
+                        quantity: quantity
+                    })
+                });
+                const res = await response.json();
+                console.log(res);
+                for (let ele in res) {
+                    // document.getElementById("data").value = ele + " : " + res[ele];
+                }
+            } catch (error) {
+                console.log("Error", error);
+            }
+
+        }
+        if (action == "get") {
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+                    method: "get",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                const res = await response.json();
+                const { name, price, quantity, _id } = res;
+                const dataArray = [_id, name, price, quantity];
+
+                const tr = document.createElement("tr");
+                for (let ele in dataArray) {
+                    const td = document.createElement("td");
+                    td.textContent = dataArray[ele];
+                    tr.appendChild(td);
+                    document.querySelector("table").appendChild(tr);
+                }
+
+
+            } catch (error) {
+                console.log("Error", error);
+            }
+
+        }
+        if (action == "get") {
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/products`, {
+                    method: "get",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                const res = await response.json();
+                for (let i = 0; i < res.length; i++) {
+                    const { name, price, quantity, _id } = res[i];
+                    const dataArray = [_id, name, price, quantity];
+                    const tr = document.createElement("tr");
+                    for (let ele in dataArray) {
+                        const td = document.createElement("td");
+                        td.textContent = dataArray[ele];
+                        tr.appendChild(td);
+                        document.querySelector("table").appendChild(tr);
+                    }
+                }
+
+            } catch (error) {
+                console.log("Error", error);
+            }
+
+        }
+        if (action == "edit") {
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+                    method: "put",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        price: price,
+                        quantity: quantity
+                    })
+                });
+                const res = await response.json();
+                for (let ele in res) {
+                    // document.getElementById("data").value = ele + " : " + res[ele];
+                }
+
+            } catch (error) {
+                console.log("Error", error);
+            }
+
+        }
+        if (action == "delete") {
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+                    method: "delete",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                const res = await fetch("http://localhost:3000/api/products", {
+                    method: "get",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                const res1 = await res.json();
+                for (let i = 0; i < res1.length; i++) {
+                    const { name, price, quantity, _id } = res1[i];
+                    const dataArray = [_id, name, price, quantity];
+                    const tr = document.createElement("tr");
+                    for (let ele in dataArray) {
+                        const td = document.createElement("td");
+                        td.textContent = dataArray[ele];
+                        tr.appendChild(td);
+                        document.querySelector("table").appendChild(tr);
+                    }
+                }
+
+
+            } catch (error) {
+                console.log("Error", error);
+            }
+
+        }
+    }
+</script>
+
+</html>
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+
+    th,
+    td {
+        padding: 15px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
